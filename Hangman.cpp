@@ -1,15 +1,5 @@
 /*
-Hangman game:
--start at menu screen with 2 options:
-    -add words
-    -play game
-    
-Add words:
-    -player inputs word
-    -word gets added to a vector
-    -also add that word to a txt file
-    -make sure that word isn't already on file
-    -if user presses quit leave the add words and go to menu
+Hangman game:    
 
 Play game:
     -Randomly pick 1 word from txt file
@@ -38,6 +28,8 @@ using namespace std;
 void displayMenu();
 int getOption();
 void playGame(vector<string>&, vector<bool>&);
+void displayWord(string);
+void getGuess(string);
 void addWord(vector<string>&, vector<bool>&);
 void listWords();
 bool containsNum(string);
@@ -120,24 +112,62 @@ void playGame(vector<string>& list, vector<bool>& isUsed) {
 
     //Picks random number from 1 to size of the word list vector
     random_device rd;
-    uniform_int_distribution<int> rand(1, list.size());
+    uniform_int_distribution<int> rand(1, list.size() - 1);
     int randnum = rand(rd);
 
-    cout << "work\n";
-
-    bool allUsed = false;
     string currentword;
-
+    bool allUsed = true;
+    
+    //Checks to see if all words are used
     for (int i = 0; i < isUsed.size(); i++) {
         if (isUsed[i] == false) {
+            allUsed = false;
             break;
         }
-        cout << "broke at index " + i;
     }
-    
-    while (isUsed[randnum] == 1) {
-        randnum = rand(rd);
-    }    
+
+    //Executes inner code if all words not used
+    if (!allUsed) {
+        //Changes randnum until finds unused word index
+        while (isUsed[randnum] == 1) {
+            randnum = rand(rd);
+        }
+    }  
+
+    currentword = list[randnum];
+
+    displayWord(currentword);
+
+}
+
+/*
+what need to do:
+first display any correctly guessed letters if any
+then display underscores under each letter in the current word
+any correctly guessed letters display above respoective underscore
+display currently guessed letters in one area
+under that display incorrect guesses
+then prompt the user to input a letter to guess
+repeat until hangman complete OR if word is currently guessed
+*/
+
+void displayWord(string currentword) {
+
+    for (int i = 0; i < currentword.length(); i++) {
+        cout << currentword[i] << " ";
+    }
+
+    cout << endl;
+
+    for (int i = 0; i < currentword.length(); i++) {
+        if (currentword[i] != ' ') {
+            cout << "_ ";
+        }
+        else {
+            cout << "  ";
+        }
+    }
+
 }
 
 void addWord(vector<string> &list, vector<bool> &isUsed) {
@@ -191,10 +221,16 @@ void listWords() {
     words.open("Words");
     string input;
 
+    cout << endl;
+
     while (words >> input) {
         cout << input << endl;
     }
 
+    cout << "\nPress enter to continue";
+
+    cin.ignore();
+    cin.get();
 }
 
 
